@@ -2,11 +2,12 @@
 //import 'phaser';
 
 const appDiv = document.getElementById('app');
-
+const width = 400;
+const height = 600;
 var config = {
   type: Phaser.AUTO,
-  width: 400,
-  height: 600,
+  width: width,
+  height: height,
   parent: appDiv,//div, w którym dzieje się rozgrywka
   //backgroundColor: '48a',
   physics: {
@@ -47,7 +48,7 @@ function create() {
   bullet.body.onWorldBounds = true;
   //this.physics.world.on('worldbounds', ballLost);
 
-  ship = this.physics.add.sprite(200, 550, 'ship');
+  ship = this.physics.add.sprite(width/2, height/2, 'ship');
   ship.setOrigin(0.5);
   ship.body.collideWorldBounds = true; //koliduje z granicami świata
   ship.body.immovable = true; //nieprzesuwalny
