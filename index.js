@@ -97,6 +97,7 @@ function create() {
       gameOver = true;
       var explosion = physics.add.sprite(ship.body.x+ship.body.width/2,ship.body.y).setOrigin(0.5).setScale(0.25);
       explosion.anims.play('explode');
+      explosion.body.velocity.y=50;
       ship.disableBody(true,true)
       console.log("gameover")
   });
@@ -134,6 +135,7 @@ function update() {
           this.physics.add.collider(bomb, ship, function () {
             var explosion = physics.add.sprite(ship.body.x+ship.body.width/2,ship.body.y).setOrigin(0.5).setScale(0.25);
             explosion.anims.play('explode');
+            explosion.body.velocity.y=100;
             ship.disableBody(true,true);
             gameOver = true;
         });
@@ -147,6 +149,7 @@ function update() {
     this.physics.add.collider(bullet, group, function (bullet, concreteInvader) {
       var explosion = physics.add.sprite(concreteInvader.body.x+concreteInvader.body.width/2,concreteInvader.body.y+concreteInvader.body.height/2).setOrigin(0.5).setScale(0.25);
       explosion.anims.play('explode')
+      explosion.body.velocity.y=-100;
       //explosion.destroy();
       //ship.anims.play('explode')
       concreteInvader.destroy();
