@@ -27,7 +27,9 @@ var explosion;//temp
 var back;
 var bullets;
 var invaders;
+var group;
 var nextBulletTime = 0;
+var gameOver = false;
 
 function preload() {
   this.load.baseURL = 'https://examples.phaser.io/assets/';
@@ -62,7 +64,7 @@ function create() {
   cursors = this.input.keyboard.createCursorKeys();
   shot = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
   
-  var group = this.physics.add.group({
+  group = this.physics.add.group({
     key: 'invader',
     frameQuantity: 24,
     gridAlign: {
@@ -78,7 +80,14 @@ function create() {
     });
 
     group.setVelocityX(80);
-    group.setVelocityY(5);
+    group.setVelocityY(60);
+
+    
+    this.physics.add.collider(group, ship, function () {//w arg. mogą być te obiekty
+      gameOver = true;
+      ship.disableBody(true,true)
+      console.log("gameover")
+  });
 }
 
 function update() {
@@ -92,10 +101,14 @@ function update() {
     console.log('w prawo')
   }
 
-  if (shot.isDown && this.time.now>=nextBulletTime) { //&& ship nierozwalony
+  if (shot.isDown && this.time.now>=nextBulletTime && !gameOver) { //&& ship nierozwalony
     console.log(this.time.now)
     console.log('spacja')
     var bullet = this.physics.add.sprite(ship.body.x + ship.body.width / 2, ship.body.y - 10, 'bullet');
+    this.physics.add.collider(bullet, group, function (bullet, concreteInvader) {
+      concreteInvader.disableBody(true,true);
+      bullet.disableBody(true,true);//+wybuch
+  });
     //bullet.setCollideWorldBounds(true);
     //bullet.body.onWorldBounds = true;
     nextBulletTime = this.time.now + 500; //w 2-ce game.time.now
