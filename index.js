@@ -27,6 +27,7 @@ var explosion;//temp
 var back;
 var score;
 var end;
+var shot;
 
 var group;
 var nextBulletTime = 0;
