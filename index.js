@@ -25,10 +25,10 @@ var ship;
 var cursors;
 var explosion;//temp
 var back;
-var bullets;
 var invaders;
 var group;
 var nextBulletTime = 0;
+var chance = 5;
 var gameOver = false;
 
 function preload() {
@@ -36,6 +36,7 @@ function preload() {
   this.load.crossOrigin = 'anonymous';
   this.load.image('background', 'games/invaders/starfield.png');
   this.load.image('bullet', 'games/invaders/bullet.png');
+  this.load.image('bomb', 'games/invaders/enemy-bullet.png')
   this.load.image('ship', 'games/invaders/player.png');
   this.load.image('invader', 'games/invaders/invader.png')
   this.load.spritesheet('explosion','games/invaders/explode.png',{frameWidth:32,frameHeight:48});
@@ -100,6 +101,19 @@ function update() {
     ship.body.velocity.x = 200;
     console.log('w prawo')
   }
+  
+  group.getChildren().forEach(function(enemy) {
+      let temp = Math.floor(Math.random() * 10000);
+
+      if(temp < chance){
+          var bomb = this.physics.add.sprite(enemy.body.x, enemy.body.y, 'bomb')
+          bomb.body.velocity.y = 200;
+          this.physics.add.collider(bomb, ship, function () {
+            ship.disableBody(true,true);
+            gameOver = true;
+        });
+      }
+  }, this);
 
   if (shot.isDown && this.time.now>=nextBulletTime && !gameOver) { //&& ship nierozwalony
     console.log(this.time.now)
