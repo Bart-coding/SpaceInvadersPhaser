@@ -25,7 +25,9 @@ var ship;
 var cursors;
 var explosion;//temp
 var back;
-var invaders;
+var score;
+var end;
+
 var group;
 var nextBulletTime = 0;
 var chance = 5;
@@ -39,7 +41,7 @@ function preload() {
   this.load.image('bomb', 'games/invaders/enemy-bullet.png')
   this.load.image('ship', 'games/invaders/player.png');
   this.load.image('invader', 'games/invaders/invader.png')
-  this.load.spritesheet('explosion','games/invaders/explode.png',{frameWidth:32,frameHeight:48});
+  this.load.spritesheet('explosion','games/invaders/explode.png',{frameWidth:180,frameHeight:120});
 }
 
 function create() {
@@ -47,7 +49,7 @@ function create() {
   back.setOrigin(0,0);
   back.setOrigin(0);
 
-  //back.setScrollFactor(0); //fixedToCamera = true;
+  //back.setScrollFactor(100,100); fixedToCamera = true;
 
   //bullet.body.bounce.set(1);
   //this.physics.world.on('worldbounds', ballLost);
@@ -81,17 +83,37 @@ function create() {
     });
 
     group.setVelocityX(80);
-    group.setVelocityY(60);
+    group.setVelocityY(20);
 
-    
+    this.anims.create({
+      key: 'explode',
+      frames: this.anims.generateFrameNumbers('explosion', { start: 0, end: 15 }),
+      frameRate: 40//,
+      //repeat: 1
+  });
+
+    var physics = this.physics;//może być globalne
     this.physics.add.collider(group, ship, function () {//w arg. mogą być te obiekty
       gameOver = true;
+      var explosion = physics.add.sprite(ship.body.x+ship.body.width/2,ship.body.y).setOrigin(0.5).setScale(0.25);
+      explosion.anims.play('explode');
       ship.disableBody(true,true)
       console.log("gameover")
   });
 }
 
 function update() {
+  var physics = this.physics;//tmp,może być globalne
+    if (gameOver){
+        score = this.add.text(200, 200, "score: "  + (24 - group.children.size).toString(), { fontSize: "32px"});
+        if(group.children.size == 0){
+            end = this.add.text(200, 300, "YOU WIN", { fontSize: "48px"});
+        } else{
+            end = this.add.text(200, 300, "GAME OVER", { fontSize: "48px"});
+        }
+        score.setOrigin(0.5);
+        end.setOrigin(0.5);
+    }
   ship.body.velocity.x = 0;
 
   if (cursors.left.isDown) { //reakcja statku na próbę przesunięcia
@@ -103,12 +125,15 @@ function update() {
   }
   
   group.getChildren().forEach(function(enemy) {
+      //if(enemy.body)
       let temp = Math.floor(Math.random() * 10000);
 
       if(temp < chance){
           var bomb = this.physics.add.sprite(enemy.body.x, enemy.body.y, 'bomb')
           bomb.body.velocity.y = 200;
           this.physics.add.collider(bomb, ship, function () {
+            var explosion = physics.add.sprite(ship.body.x+ship.body.width/2,ship.body.y).setOrigin(0.5).setScale(0.25);
+            explosion.anims.play('explode');
             ship.disableBody(true,true);
             gameOver = true;
         });
@@ -120,26 +145,20 @@ function update() {
     console.log('spacja')
     var bullet = this.physics.add.sprite(ship.body.x + ship.body.width / 2, ship.body.y - 10, 'bullet');
     this.physics.add.collider(bullet, group, function (bullet, concreteInvader) {
-      concreteInvader.disableBody(true,true);
-      bullet.disableBody(true,true);//+wybuch
+      var explosion = physics.add.sprite(concreteInvader.body.x+concreteInvader.body.width/2,concreteInvader.body.y+concreteInvader.body.height/2).setOrigin(0.5).setScale(0.25);
+      explosion.anims.play('explode')
+      //explosion.destroy();
+      //ship.anims.play('explode')
+      concreteInvader.destroy();
+      bullet.destroy();
+      if (group.children.size == 0){
+        gameOver = true;
+    }
   });
     //bullet.setCollideWorldBounds(true);
     //bullet.body.onWorldBounds = true;
     nextBulletTime = this.time.now + 500; //w 2-ce game.time.now
     console.log(nextBulletTime)
     bullet.body.velocity.y = -200;
-  }
-
-  //this.physics.collide(bulletTest, ship, bulletHitsShip);//do testów
-  function bulletHitsShip(bulletTest, ship) { //do testów
-    console.log(ship.body.x)
-    bulletTest.disableBody(true, true); //skasowanie ciała pocisku
-
-    /*explosion = this.physics.add.sprite(ship.x,ship.y,'explosion');
-    ship.disableBody(true,true);
-    this.anims.create({key:'collision',
-    frames:this.anims.generateFrameNumbers('explosion',
-    {start:0,end:15}),frameRate:10,repeat:1});
-    explosion.anims.play('collision', true);*/
   }
 }
