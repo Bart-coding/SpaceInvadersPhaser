@@ -9,7 +9,6 @@ var config = {
   width: width,
   height: height,    
   parent: appDiv,//div, w którym dzieje się rozgrywka
-  //backgroundColor: '48a',
   physics: {
     default: 'arcade'
   },
@@ -25,7 +24,7 @@ var ship;
 var cursors;
 var explosion;//temp
 var back;
-var score;
+var score = null;
 var end;
 var shot;
 
@@ -33,6 +32,7 @@ var group;
 var nextBulletTime = 0;
 var chance = 5;
 var gameOver = false;
+var shipDestroyed = false;
 
 function preload() {
   this.load.baseURL = 'https://examples.phaser.io/assets/';
@@ -61,9 +61,6 @@ function create() {
   ship.body.collideWorldBounds = true; //koliduje z granicami świata
   //ship.body.immovable = true; //nieprzesuwalny
 
-  /*var bulletTest = this.physics.add.sprite(width/4, height*0.9, 'bullet');//testy
-  bulletTest.setOrigin(0.5);
-  bulletTest.name = 'bulletTest';*/
   
   cursors = this.input.keyboard.createCursorKeys();
   shot = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -100,65 +97,75 @@ function create() {
       explosion.anims.play('explode');
       explosion.body.velocity.y=50;
       ship.disableBody(true,true)
+      shipDestroyed = true; //testy
       console.log("gameover")
   });
+
+
 }
 
 function update() {
   var physics = this.physics;//tmp,może być globalne
-    if (gameOver){
+    if (gameOver && !shipDestroyed){
         score = this.add.text(200, 200, "score: "  + (24 - group.children.size).toString(), { fontSize: "32px"});
-        if(group.children.size == 0){
-            end = this.add.text(200, 300, "YOU WIN", { fontSize: "48px"});
-        } else{
-            end = this.add.text(200, 300, "GAME OVER", { fontSize: "48px"});
-        }
-        score.setOrigin(0.5);
+        end = this.add.text(200, 300, "YOU WIN", { fontSize: "48px"});
         end.setOrigin(0.5);
+        score.setOrigin(0.5);
+        
     }
-  ship.body.velocity.x = 0;
+    else if (gameOver) {
+        if 
+          (score===null) score = this.add.text(200, 200, "score: "  + (24 - group.children.size).toString(), { fontSize: "32px"});
+        else 
+          score.setText("score: "  + (24 - group.children.size).toString())
+        end = this.add.text(200, 300, "GAME OVER", { fontSize: "48px"});
+        end.setOrigin(0.5);
+        score.setOrigin(0.5);
+    }
+    ship.body.velocity.x = 0;
 
-  if (cursors.left.isDown) { //reakcja statku na próbę przesunięcia
-    ship.body.velocity.x = -200;
-    console.log('w lewo')
-  } else if (cursors.right.isDown) {
-    ship.body.velocity.x = 200;
-    console.log('w prawo')
-  }
+    if (cursors.left.isDown) { //reakcja statku na próbę przesunięcia
+      ship.body.velocity.x = -200;
+      console.log('w lewo')
+    } else if (cursors.right.isDown) {
+      ship.body.velocity.x = 200;
+      console.log('w prawo')
+    }
   
-  group.getChildren().forEach(function(enemy) {
-      //if(enemy.body)
-      let temp = Math.floor(Math.random() * 10000);
+    group.getChildren().forEach(function(enemy) {
+        //if(enemy.body)
+        let temp = Math.floor(Math.random() * 10000);
 
-      if(temp < chance){
-          var bomb = this.physics.add.sprite(enemy.body.x, enemy.body.y, 'bomb')
-          bomb.body.velocity.y = 200;
-          this.physics.add.collider(bomb, ship, function () {
-            var explosion = physics.add.sprite(ship.body.x+ship.body.width/2,ship.body.y).setOrigin(0.5).setScale(0.25);
-            explosion.anims.play('explode');
-            explosion.body.velocity.y=100;
-            ship.disableBody(true,true);
-            gameOver = true;
-        });
+        if(temp < chance){
+            var bomb = this.physics.add.sprite(enemy.body.x, enemy.body.y, 'bomb')
+            bomb.body.velocity.y = 200;
+            this.physics.add.collider(bomb, ship, function () {
+              var explosion = physics.add.sprite(ship.body.x+ship.body.width/2,ship.body.y).setOrigin(0.5).setScale(0.25);
+              explosion.anims.play('explode');
+              explosion.body.velocity.y=100;
+              ship.disableBody(true,true);
+              shipDestroyed = true; //testy
+              gameOver = true;
+          });
+        }
+    }, this);
+
+    if (shot.isDown && this.time.now>=nextBulletTime && !gameOver) { //&& ship nierozwalony
+      console.log(this.time.now)
+      console.log('spacja')
+      var bullet = this.physics.add.sprite(ship.body.x + ship.body.width / 2, ship.body.y - 10, 'bullet');
+      this.physics.add.collider(bullet, group, function (bullet, concreteInvader) {
+        var explosion = physics.add.sprite(concreteInvader.body.x+concreteInvader.body.width/2,concreteInvader.body.y+concreteInvader.body.height/2).setOrigin(0.5).setScale(0.25);
+        explosion.anims.play('explode')
+        explosion.body.velocity.y=-100;
+        //explosion.destroy();
+        //ship.anims.play('explode')
+        concreteInvader.destroy();
+        bullet.destroy();
+        if (group.children.size == 0){
+          gameOver = true;
       }
-  }, this);
-
-  if (shot.isDown && this.time.now>=nextBulletTime && !gameOver) { //&& ship nierozwalony
-    console.log(this.time.now)
-    console.log('spacja')
-    var bullet = this.physics.add.sprite(ship.body.x + ship.body.width / 2, ship.body.y - 10, 'bullet');
-    this.physics.add.collider(bullet, group, function (bullet, concreteInvader) {
-      var explosion = physics.add.sprite(concreteInvader.body.x+concreteInvader.body.width/2,concreteInvader.body.y+concreteInvader.body.height/2).setOrigin(0.5).setScale(0.25);
-      explosion.anims.play('explode')
-      explosion.body.velocity.y=-100;
-      //explosion.destroy();
-      //ship.anims.play('explode')
-      concreteInvader.destroy();
-      bullet.destroy();
-      if (group.children.size == 0){
-        gameOver = true;
-    }
-  });
+    });
     //bullet.setCollideWorldBounds(true);
     //bullet.body.onWorldBounds = true;
     nextBulletTime = this.time.now + 500; //w 2-ce game.time.now
