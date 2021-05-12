@@ -26,6 +26,7 @@ var cursors;
 var explosion;//temp
 var back;
 var bullets;
+var invaders;
 var nextBulletTime = 0;
 
 function preload() {
@@ -34,6 +35,7 @@ function preload() {
   this.load.image('background', 'games/invaders/starfield.png');
   this.load.image('bullet', 'games/invaders/bullet.png');
   this.load.image('ship', 'games/invaders/player.png');
+  this.load.image('invader', 'games/invaders/invader.png')
   this.load.spritesheet('explosion','games/invaders/explode.png',{frameWidth:32,frameHeight:48});
 }
 
@@ -49,6 +51,7 @@ function create() {
 
   ship = this.physics.add.sprite(width/2, height*0.9, 'ship');
   ship.setOrigin(0.5);
+  ship.setScale(2);
   ship.body.collideWorldBounds = true; //koliduje z granicami świata
   //ship.body.immovable = true; //nieprzesuwalny
 
@@ -56,15 +59,31 @@ function create() {
   bulletTest.setOrigin(0.5);
   bulletTest.name = 'bulletTest';*/
   
-
   cursors = this.input.keyboard.createCursorKeys();
   shot = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
   
+  var group = this.physics.add.group({
+    key: 'invader',
+    frameQuantity: 24,
+    gridAlign: {
+        x: 30,
+        y: 50,
+        width: 8,
+        height: 8,
+        cellWidth: 40,
+    },
+    setScale: {x: 2, y: 2},
+    bounceX: 1,
+    collideWorldBounds: true
+    });
 
+    group.setVelocityX(80);
+    group.setVelocityY(5);
 }
 
 function update() {
   ship.body.velocity.x = 0;
+
   if (cursors.left.isDown) { //reakcja statku na próbę przesunięcia
     ship.body.velocity.x = -200;
     console.log('w lewo')
@@ -72,18 +91,17 @@ function update() {
     ship.body.velocity.x = 200;
     console.log('w prawo')
   }
+
   if (shot.isDown && this.time.now>=nextBulletTime) { //&& ship nierozwalony
     console.log(this.time.now)
     console.log('spacja')
-    var bullet = this.physics.add.sprite(ship.body.x+15, ship.body.y, 'bullet');
+    var bullet = this.physics.add.sprite(ship.body.x + ship.body.width / 2, ship.body.y - 10, 'bullet');
     //bullet.setCollideWorldBounds(true);
     //bullet.body.onWorldBounds = true;
-    nextBulletTime = this.time.now + 600; //w 2-ce game.time.now
+    nextBulletTime = this.time.now + 500; //w 2-ce game.time.now
     console.log(nextBulletTime)
     bullet.body.velocity.y = -200;
   }
-
-
 
   //this.physics.collide(bulletTest, ship, bulletHitsShip);//do testów
   function bulletHitsShip(bulletTest, ship) { //do testów
