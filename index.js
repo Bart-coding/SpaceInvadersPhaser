@@ -48,8 +48,6 @@ function preload() {
 function create() {
   back = this.add.tileSprite(0, 0, width, height, 'background');
   back.setOrigin(0,0);
-  back.setOrigin(0);
-
 
 
   ship = this.physics.add.sprite(width/2, height*0.9, 'ship');
@@ -57,11 +55,6 @@ function create() {
   ship.setScale(2);
   ship.body.collideWorldBounds = true;
  
-
-  
-  cursors = this.input.keyboard.createCursorKeys();
-  shot = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-  restart = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
   
   group = this.physics.add.group({
     key: 'invader',
@@ -101,28 +94,35 @@ function create() {
   });
 
 
+    cursors = this.input.keyboard.createCursorKeys();
+    shot = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    restart = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
+
+
 }
 
 function update() {
-  if (!shipDestroyed) {
-    back.tilePositionY -= 0.3;
-  }
-  if (shipDestroyed) {
-    group.setVelocityX(0);
-    group.setVelocityY(0);
-  }
+
+    if (!shipDestroyed) {
+      back.tilePositionY -= 0.3;
+    }
+    if (shipDestroyed) {
+      group.setVelocityX(0);
+      group.setVelocityY(0);
+    }
     
+    //
+    if(chance == 10 && group.children.size <= 18){
+      chance = 15;
+    }
+    if(chance == 15 && group.children.size <= 12){
+      chance = 20;
+    }
+    if(chance == 20 && group.children.size <= 6){
+      chance = 40;
+    }
 
-  if(chance == 10 && group.children.size <= 18){
-    chance = 15;
-  }
-  if(chance == 15 && group.children.size <= 12){
-    chance = 20;
-  }
-  if(chance == 20 && group.children.size <= 6){
-    chance = 40;
-  }
-
+    //
     if (restart.isDown) {
       this.registry.destroy();
       this.events.off();
@@ -134,6 +134,7 @@ function update() {
       nextBulletTime = 0;
     }
 
+    //
     var physics = this.physics;
       if (gameOver && !shipDestroyed){
           score = this.add.text(200, 200, "score: "  + (24 - group.children.size).toString(), { fontSize: "32px"});
@@ -156,6 +157,8 @@ function update() {
 
           
       }
+
+      //
       ship.body.velocity.x = 0;
 
       if (cursors.left.isDown) { //reakcja statku na próbę przesunięcia
@@ -165,7 +168,8 @@ function update() {
         ship.body.velocity.x = 200;
         console.log('w prawo')
       }
-    
+      
+      //
       group.getChildren().forEach(function(enemy) {
           let temp = Math.floor(Math.random() * 10000);
 
@@ -182,7 +186,8 @@ function update() {
             });
           }
       }, this);
-
+      
+      //
       if (shot.isDown && this.time.now>=nextBulletTime && !shipDestroyed) {
         console.log(this.time.now)
         console.log('spacja')
@@ -199,7 +204,7 @@ function update() {
         }
       });
       nextBulletTime = this.time.now + 500; //w 2-ce game.time.now
-      console.log(nextBulletTime)
       bullet.body.velocity.y = -200;
     }
+    //
 }
