@@ -104,8 +104,14 @@ function create() {
 }
 
 function update() {
-
-  back.tilePositionY -= 0.3;
+  if (!shipDestroyed) {
+    back.tilePositionY -= 0.3;
+  }
+  if (shipDestroyed) {
+    group.setVelocityX(0);
+    group.setVelocityY(0);
+  }
+    
 
   if(chance == 10 && group.children.size <= 18){
     chance = 15;
