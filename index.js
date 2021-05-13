@@ -22,7 +22,7 @@ var config = {
 var game = new Phaser.Game(config);
 var ship;
 var cursors;
-var explosion;//temp
+var explosion;
 var back;
 var score = null;
 var end = null;
@@ -92,30 +92,18 @@ function create() {
       //repeat: 1
   });
 
-    var physics = this.physics;//może być globalne
+    var physics = this.physics;
     this.physics.add.collider(group, ship, function () {//w arg. mogą być te obiekty
       gameOver = true;
       var explosion = physics.add.sprite(ship.body.x+ship.body.width/2,ship.body.y).setOrigin(0.5).setScale(0.25);
       explosion.anims.play('explode');
       explosion.body.velocity.y=50;
       ship.disableBody(true,true)
-      shipDestroyed = true; //testy
+      shipDestroyed = true;
       console.log("gameover")
   });
 
 
-  
-  /*this.physics.add.collider(group,bounds, function (concreteInvader, bounds) {
-    //concreteInvader.body.setCollideWorldBoundsY(false)
-      console.log(height)
-      if (bounds.y>height-30) {
-      console.log("weszlo")
-      concreteInvader.body.setCollideWorldBounds(false)
-      /*concreteInvader.body.reset(concreteInvader.x,0)
-      concreteInvader.setVelocityX(80);
-      concreteInvader.setVelocityY(20);
-      }
-  });*/
   //console.log(bounds.y)
   /*group.getChildren().forEach((concreteInvader) => {
     console.log(this.bounds.y)
@@ -145,9 +133,9 @@ if(chance == 20 && group.children.size <= 6){
 }
 
   if (restart.isDown) {
-    this.registry.destroy(); // destroy registry
-    this.events.off(); // disable all active events
-    this.scene.restart(); // restart current scene*/
+    this.registry.destroy();
+    this.events.off();
+    this.scene.restart();
     if (gameOver) gameOver = false;
     if (shipDestroyed) shipDestroyed = false;
     if (score!==null) score = null;
@@ -155,7 +143,7 @@ if(chance == 20 && group.children.size <= 6){
     nextBulletTime = 0;
   }
 
-  var physics = this.physics;//tmp,może być globalne
+  var physics = this.physics;
     if (gameOver && !shipDestroyed){
         score = this.add.text(200, 200, "score: "  + (24 - group.children.size).toString(), { fontSize: "32px"});
         end = this.add.text(200, 300, "YOU WIN", { fontSize: "48px"});
@@ -190,7 +178,7 @@ if(chance == 20 && group.children.size <= 6){
     group.getChildren().forEach(function(enemy) {
         let temp = Math.floor(Math.random() * 10000);
 
-        if(temp < chance){
+        if(temp < chance && !shipDestroyed){
             var bomb = this.physics.add.sprite(enemy.body.x, enemy.body.y, 'bomb')
             bomb.body.velocity.y = 200;
             this.physics.add.collider(bomb, ship, function () {
@@ -204,7 +192,7 @@ if(chance == 20 && group.children.size <= 6){
         }
     }, this);
 
-    if (shot.isDown && this.time.now>=nextBulletTime && !gameOver) { //&& ship nierozwalony
+    if (shot.isDown && this.time.now>=nextBulletTime && !shipDestroyed) {
       console.log(this.time.now)
       console.log('spacja')
       var bullet = this.physics.add.sprite(ship.body.x + ship.body.width / 2, ship.body.y - 10, 'bullet');
@@ -219,8 +207,6 @@ if(chance == 20 && group.children.size <= 6){
           gameOver = true;
       }
     });
-    //bullet.setCollideWorldBounds(true);
-    //bullet.body.onWorldBounds = true;
     nextBulletTime = this.time.now + 500; //w 2-ce game.time.now
     console.log(nextBulletTime)
     bullet.body.velocity.y = -200;
