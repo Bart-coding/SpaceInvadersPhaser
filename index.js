@@ -30,7 +30,7 @@ var shot;
 
 var group;
 var nextBulletTime = 0;
-var chance = 5;
+var chance = 10;
 var gameOver = false;
 var shipDestroyed = false;
 //var bounds;// = Phaser.GetBounds.getBottomBounds();//this.physics.arcade.bounds;
