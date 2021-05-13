@@ -103,10 +103,37 @@ function create() {
   });
 
 
+  
+  /*this.physics.add.collider(group,bounds, function (concreteInvader, bounds) {
+    //concreteInvader.body.setCollideWorldBoundsY(false)
+      console.log(height)
+      if (bounds.y>height-30) {
+      console.log("weszlo")
+      concreteInvader.body.setCollideWorldBounds(false)
+      /*concreteInvader.body.reset(concreteInvader.x,0)
+      concreteInvader.setVelocityX(80);
+      concreteInvader.setVelocityY(20);
+      }
+  });*/
+  //console.log(bounds.y)
+  /*group.getChildren().forEach((concreteInvader) => {
+    console.log(this.bounds.y)
+    physics.add.collider(concreteInvader,bounds, function (concreteInvader, bounds) {
+      //concreteInvader.body.setCollideWorldBoundsY(false)
+        console.log(height)
+        if (bounds.y>height-30) {
+        console.log("weszlo")
+        concreteInvader.body.setCollideWorldBounds(false)
+        }
+      });
+  },this);*/
+
 
 }
 
 function update() {
+  console.log(this)
+
   var physics = this.physics;//tmp,może być globalne
     if (gameOver && !shipDestroyed){
         score = this.add.text(200, 200, "score: "  + (24 - group.children.size).toString(), { fontSize: "32px"});
@@ -122,7 +149,7 @@ function update() {
           score.setText("score: "  + (24 - group.children.size).toString())
         if (end===null)
           end = this.add.text(200, 300, "GAME OVER", { fontSize: "48px"});
-        else
+        else if (group.children.size===0)
           end.setText("YOU WIN")
         end.setOrigin(0.5);
         score.setOrigin(0.5);
