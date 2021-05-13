@@ -141,8 +141,10 @@ function update() {
       //explosion.destroy();
       //ship.anims.play('explode')
       concreteInvader.destroy();
-      
       bullet.destroy();
+      if (group.children.size == 0){
+        gameOver = true;
+    }
   });
     //bullet.setCollideWorldBounds(true);
     //bullet.body.onWorldBounds = true;

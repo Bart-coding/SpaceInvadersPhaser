@@ -25,7 +25,7 @@ var cursors;
 var explosion;//temp
 var back;
 var score = null;
-var end;
+var end = null;
 var shot;
 
 var group;
@@ -33,6 +33,8 @@ var nextBulletTime = 0;
 var chance = 5;
 var gameOver = false;
 var shipDestroyed = false;
+//var bounds;// = Phaser.GetBounds.getBottomBounds();//this.physics.arcade.bounds;
+//var bottomBounds = Phaser.GetBounds.getBottomBounds();
 
 function preload() {
   this.load.baseURL = 'https://examples.phaser.io/assets/';
@@ -52,14 +54,12 @@ function create() {
 
   //back.setScrollFactor(100,100); fixedToCamera = true;
 
-  //bullet.body.bounce.set(1);
-  //this.physics.world.on('worldbounds', ballLost);
 
   ship = this.physics.add.sprite(width/2, height*0.9, 'ship');
   ship.setOrigin(0.5);
   ship.setScale(2);
   ship.body.collideWorldBounds = true; //koliduje z granicami świata
-  //ship.body.immovable = true; //nieprzesuwalny
+ 
 
   
   cursors = this.input.keyboard.createCursorKeys();
@@ -77,6 +77,7 @@ function create() {
     },
     setScale: {x: 2, y: 2},
     bounceX: 1,
+    bounceY: 0,
     collideWorldBounds: true
     });
 
@@ -102,6 +103,7 @@ function create() {
   });
 
 
+
 }
 
 function update() {
@@ -118,9 +120,14 @@ function update() {
           (score===null) score = this.add.text(200, 200, "score: "  + (24 - group.children.size).toString(), { fontSize: "32px"});
         else 
           score.setText("score: "  + (24 - group.children.size).toString())
-        end = this.add.text(200, 300, "GAME OVER", { fontSize: "48px"});
+        if (end===null)
+          end = this.add.text(200, 300, "GAME OVER", { fontSize: "48px"});
+        else
+          end.setText("YOU WIN")
         end.setOrigin(0.5);
         score.setOrigin(0.5);
+
+        
     }
     ship.body.velocity.x = 0;
 
@@ -133,7 +140,6 @@ function update() {
     }
   
     group.getChildren().forEach(function(enemy) {
-        //if(enemy.body)
         let temp = Math.floor(Math.random() * 10000);
 
         if(temp < chance){
@@ -144,7 +150,7 @@ function update() {
               explosion.anims.play('explode');
               explosion.body.velocity.y=100;
               ship.disableBody(true,true);
-              shipDestroyed = true; //testy
+              shipDestroyed = true;
               gameOver = true;
           });
         }
@@ -159,7 +165,6 @@ function update() {
         explosion.anims.play('explode')
         explosion.body.velocity.y=-100;
         //explosion.destroy();
-        //ship.anims.play('explode')
         concreteInvader.destroy();
         bullet.destroy();
         if (group.children.size == 0){
