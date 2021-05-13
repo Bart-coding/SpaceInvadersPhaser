@@ -64,6 +64,7 @@ function create() {
   
   cursors = this.input.keyboard.createCursorKeys();
   shot = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+  restart = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
   
   group = this.physics.add.group({
     key: 'invader',
@@ -132,7 +133,17 @@ function create() {
 }
 
 function update() {
-  console.log(this)
+  
+  if (restart.isDown) {
+    this.registry.destroy(); // destroy registry
+    this.events.off(); // disable all active events
+    this.scene.restart(); // restart current scene*/
+    if (gameOver) gameOver = false;
+    if (shipDestroyed) shipDestroyed = false;
+    if (score!==null) score = null;
+    if (end!==null) end = null;
+    nextBulletTime = 0;
+  }
 
   var physics = this.physics;//tmp,może być globalne
     if (gameOver && !shipDestroyed){
