@@ -134,6 +134,16 @@ function create() {
 
 function update() {
   
+if(chance == 10 && group.children.size <= 18){
+  chance = 15;
+}
+if(chance == 15 && group.children.size <= 12){
+  chance = 20;
+}
+if(chance == 20 && group.children.size <= 6){
+  chance = 40;
+}
+
   if (restart.isDown) {
     this.registry.destroy(); // destroy registry
     this.events.off(); // disable all active events
