@@ -33,7 +33,6 @@ var nextBulletTime = 0;
 var chance = 10;
 var gameOver = false;
 var shipDestroyed = false;
-//var bounds;// = Phaser.GetBounds.getBottomBounds();//this.physics.arcade.bounds;-
 
 function preload() {
   this.load.baseURL = 'https://examples.phaser.io/assets/';
@@ -100,20 +99,6 @@ function create() {
       shipDestroyed = true;
       console.log("gameover")
   });
-
-
-  //console.log(bounds.y)
-  /*group.getChildren().forEach((concreteInvader) => {
-    console.log(this.bounds.y)
-    physics.add.collider(concreteInvader,bounds, function (concreteInvader, bounds) {
-      //concreteInvader.body.setCollideWorldBoundsY(false)
-        console.log(height)
-        if (bounds.y>height-30) {
-        console.log("weszlo")
-        concreteInvader.body.setCollideWorldBounds(false)
-        }
-      });
-  },this);*/
 
 
 }
@@ -200,7 +185,7 @@ function update() {
           var explosion = physics.add.sprite(concreteInvader.body.x+concreteInvader.body.width/2,concreteInvader.body.y+concreteInvader.body.height/2).setOrigin(0.5).setScale(0.25);
           explosion.anims.play('explode')
           explosion.body.velocity.y=-100;
-          //explosion.destroy();
+          //explosion.destroy(); //pozostawione, widać "szczątki" kosmity
           concreteInvader.destroy();
           bullet.destroy();
           if (group.children.size == 0){
